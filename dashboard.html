@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Government IT Tenders Monitor</title>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --primary-dark: #0d5cb6;
+            --secondary: #f8f9fa;
+            --text: #202124;
+            --light-gray: #f5f5f5;
+            --border: #dadce0;
+            --success: #34a853;
+            --warning: #f9ab00;
+            --danger: #ea4335;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            color: var(--text);
+            background-color: #f0f2f5;
+        }
+
+        .container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+        }
+
+        h1 {
+            color: var(--primary);
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--primary);
+            transition: transform 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .metric-card h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #5f6368;
+        }
+
+        .metric-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 0;
+        }
+
+        .status-card, .config-card, .tenders-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        h2 {
+            color: var(--primary);
+            margin-top: 0;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .btn {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 16px;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(26, 115, 232, 0.2);
+        }
+
+        .debug-info {
+            margin-top: 25px;
+            background: #fff8e1;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--warning);
+        }
+
+        .source {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .source:last-child {
+            border-bottom: none;
+        }
+
+        .selector-list {
+            font-family: monospace;
+            background: var(--light-gray);
+            padding: 5px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            font-size: 14px;
+        }
+
+        .tenders-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .tender-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            border-top: 3px solid var(--primary);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tender-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+        }
+
+        .tender-card h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: var(--primary);
+            font-size: 18px;
+        }
+
+        .tender-detail {
+            margin-bottom: 10px;
+            display: flex;
+        }
+
+        .tender-detail strong {
+            min-width: 120px;
+            display: inline-block;
+            color: #5f6368;
+        }
+
+        .tender-detail span {
+            flex: 1;
+        }
+
+        .tender-actions {
+            margin-top: auto;
+            padding-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tender-status {
+            font-size: 14px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            background: #e8f0fe;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .view-btn {
+            background: var(--primary);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .view-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-active {
+            background: #e6f4ea;
+            color: var(--success);
+        }
+
+        .badge-closed {
+            background: #fce8e6;
+            color: var(--danger);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .organisation {
+            font-weight: 600;
+            color: #5f6368;
+            font-size: 15px;
+        }
+
+        .date-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .date-box {
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 12px;
+        }
+
+        .date-label {
+            font-size: 12px;
+            color: #5f6368;
+            margin-bottom: 5px;
+        }
+
+        .date-value {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .tenders-container {
+                grid-template-columns: 1fr;
+            }
+
+            .metrics {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Government IT Tenders Monitor</h1>
+            <a href="/run-now" class="btn">Run Now</a>
+        </header>
+
+        <div class="metrics">
+            <div class="metric-card">
+                <h3>Last Run</h3>
+                <p class="metric-value">{{ last_run }}</p>
+            </div>
+            <div class="metric-card">
+                <h3>Last Status</h3>
+                <p class="metric-value">{{ last_status }}</p>
+            </div>
+            <div class="metric-card">
+                <h3>Last Tenders Found</h3>
+                <p class="metric-value">{{ tenders_found }}</p>
+            </div>
+            <div class="metric-card">
+                <h3>Total Tenders</h3>
+                <p class="metric-value">{{ total_tenders }}</p>
+            </div>
+        </div>
+
+        <div class="status-card">
+            <h2>System Status</h2>
+            <p>The tender monitor runs automatically daily at 9:00 AM.</p>
+
+            <div class="debug-info">
+                <h3>Debugging Information</h3>
+                <p>If no tenders are found:</p>
+                <ol>
+                    <li>Check <code>gem_screenshot.png</code> for page rendering</li>
+                    <li>Inspect <code>gem_page.html</code> for content</li>
+                    <li>Verify MongoDB connection in <code>.env</code></li>
+                    <li>Check server logs for errors</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="tenders-card">
+            <h2>Latest Tenders</h2>
+            <div class="tenders-container">
+                {% for tender in tenders %}
+                <div class="tender-card">
+                    <div class="card-header">
+                        <div class="organisation">{{ tender.organisation_name }}</div>
+                        <div class="tender-status">Active</div>
+                    </div>
+
+                    <h3>{{ tender.tender_name }}</h3>
+
+                    <div class="date-info">
+                        <div class="date-box">
+                            <div class="date-label">Published</div>
+                            <div class="date-value">{{ tender.publish_date }}</div>
+                        </div>
+                        <div class="date-box">
+                            <div class="date-label">Closes</div>
+                            <div class="date-value">{{ tender.close_date }}</div>
+                        </div>
+                    </div>
+
+                    <div class="tender-actions">
+                        <div class="date-value">Opens: {{ tender.opening_date }}</div>
+                        <a href="{{ tender.url }}" class="view-btn" target="_blank">View</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="config-card">
+            <h2>Configuration</h2>
+            <div class="section">
+                <h3>Sources</h3>
+                <div>
+                    {% for source in sources %}
+                    <div class="source">
+                        <h4>{{ source.name }}</h4>
+                        <p>URL: <a href="{{ source.url }}" target="_blank">{{ source.url }}</a></p>
+                        <p>Selectors:</p>
+                        <ul>
+                            {% for key, value in source.selectors.items() %}
+                            <li>
+                                <strong>{{ key }}:</strong>
+                                <span class="selector-list">{{ value }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
