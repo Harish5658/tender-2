@@ -1,5 +1,6 @@
-Flask==3.0.0
+Flask==2.3.3
 requests==2.31.0
-beautifulsoup4==4.12.2
-lxml==4.9.3
-
+beautifulsoup4==4.12.3
+selenium==4.21.0
+python-dotenv==1.0.1
+pymongo==4.7.2
